@@ -1,12 +1,16 @@
-
----
-
-## 📘 `doc/mautopairs.txt`
-
-```text
 *mautopairs.txt*        Minimal auto-pairs plugin for Neovim
+
 ==============================================================================
-Overview                                                       *mautopairs*
+CONTENTS                                            *mautopairs-contents*
+
+1. Overview .................... |mautopairs-overview|
+2. Usage ....................... |mautopairs-usage|
+3. Logic ....................... |mautopairs-logic|
+4. Installation ................ |mautopairs-installation|
+5. Author ...................... |mautopairs-author|
+
+==============================================================================
+OVERVIEW                                              *mautopairs-overview*
 
 mautopairs.nvim automatically inserts matching pairs for common symbols
 like (), [], {}, "", '', <> when typing in Insert mode.
@@ -14,7 +18,7 @@ like (), [], {}, "", '', <> when typing in Insert mode.
 It's written in pure Lua, has no dependencies, and supports word wrapping logic.
 
 ==============================================================================
-Usage                                                         *mautopairs-usage*
+USAGE                                                    *mautopairs-usage*
 
 Default setup:
 >
@@ -32,7 +36,7 @@ Configuration example:
 This adds custom pairs and enables debug printing through `vim.print`.
 
 ==============================================================================
-Logic                                                        *mautopairs-logic*
+LOGIC                                                    *mautopairs-logic*
 
 The function that decides what to insert (`ch_insert`) returns:
 
@@ -46,12 +50,13 @@ It checks:
   - even count of symbols in each half
 
 ==============================================================================
-Installation                                                  *mautopairs-install*
+INSTALLATION                                        *mautopairs-installation*
 
 With lazy.nvim:
 >
- return {
+  return {
     "yourname/mautopairs.nvim",
+    event = "InsertEnter",
     config = function()
       require("mautopairs").setup()
     end
@@ -69,10 +74,10 @@ With packer.nvim:
 <
 
 ==============================================================================
+AUTHOR                                                  *mautopairs-author*
+
 Author: Sergey Tkachenko  
 License: MIT  
-GitHub: https://github.com/yourname/mautopairs.nvim
+GitHub: https://github.com/tkachenkosi/mautopairs.nvim
 
-==============================================================================
-End of file                                                  *mautopairs.txt*
-
+ vim:tw=78:ts=8:ft=help:norl:
