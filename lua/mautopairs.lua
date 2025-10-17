@@ -13,9 +13,6 @@ local PAIRS = {
 -- Проверка необходимости вставки парного символа (исправлён подсчёт)
 local function ch_insert(line, col, open_char)
   local close_char = PAIRS[open_char]
-  if not close_char then
-    return 1
-  end
 
   local left = line:sub(1, col)
   local right = line:sub(col + 1)
