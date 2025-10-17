@@ -35,8 +35,6 @@
   3 — обрамляем слово под курсором
 
 ==============================================================================
-Автор и лицензия                                         *mautopairs-author*
-
 Автор: Sergey Tkachenko  
 Лицензия: MIT  
 GitHub: <https://github.com/yourname/mautopairs.nvim>

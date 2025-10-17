@@ -23,11 +23,11 @@ web → (web)
 
 ### Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 ```lua
-{
+return {
 "yourname/mautopairs.nvim",
 config = function()
   require("mautopairs").setup()
-end
+end,
 }
 
 

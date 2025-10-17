@@ -50,7 +50,7 @@ Installation                                                  *mautopairs-instal
 
 With lazy.nvim:
 >
-  {
+ return {
     "yourname/mautopairs.nvim",
     config = function()
       require("mautopairs").setup()
@@ -69,8 +69,6 @@ With packer.nvim:
 <
 
 ==============================================================================
-Author & License                                              *mautopairs-author*
-
 Author: Sergey Tkachenko  
 License: MIT  
 GitHub: https://github.com/yourname/mautopairs.nvim
