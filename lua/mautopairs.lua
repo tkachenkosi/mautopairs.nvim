@@ -25,24 +25,25 @@ local function word_right(line, col)
 end
 
 -- Проверка необходимости вставки парного символа
-local function ch_insert(line, col, open_char)
-  local close_char = PAIRS[open_char]
+local function ch_insert(line, col, open_ch)
+  local close_ch = PAIRS[open_ch]
 
   local left  = line:sub(1, col)
   local right = line:sub(col + 1)
+	local wo, wc = select(2, left:gsub(vim.pesc(open_ch), "")), select(2, left:gsub(vim.pesc(close_ch), ""))
 
   -- Skip: курсор прямо перед закрывающим символом
-  if right:sub(1, 1) == close_char then
-    if open_char == close_char then
+  if right:sub(1, 1) == close_ch then
+    if open_ch == close_ch then
       return 1                                -- одинаковые символы (кавычки)
     end
-    if count_char(left, open_char) > count_char(left, close_char) then
+    if wo > wc then
       return 1                                -- есть «открытая» скобка
     end
   end
 
-  local bal_l = count_char(left,  open_char)  - count_char(left,  close_char)
-  local bal_r = count_char(right, close_char) - count_char(right, open_char)
+  local bal_l = wo  - wc
+  local bal_r = count_char(right, close_ch) - count_char(right, open_ch)
 
   if bal_l == 0 and bal_r == 0 then
     local wb, wa = word_left(line, col), word_right(line, col)
@@ -52,30 +53,30 @@ local function ch_insert(line, col, open_char)
     return 2
   end
 
-  return 2
+  return 1
 end
 
 -- Основная логика вставки
-local function handle_pair(open_char)
-  local close_char = PAIRS[open_char]
-  if not close_char then return open_char end
+local function handle_pair(open_ch)
+  local close_ch = PAIRS[open_ch]
+  if not close_ch then return open_ch end
 
   local _, col = unpack(vim.api.nvim_win_get_cursor(0))
   local line = vim.api.nvim_get_current_line()
-  local mode = ch_insert(line, col, open_char)
+  local mode = ch_insert(line, col, open_ch)
 
   if mode == 1 then
-    return open_char
+    return open_ch
   elseif mode == 2 then
-    return open_char .. close_char .. "<Left>"
+    return open_ch .. close_ch .. "<Left>"
   elseif mode == 3 then
     local wb = word_left(line, col)
     local wa = word_right(line, col)
     local del_back = string.rep("<C-h>", vim.fn.strchars(wb))
     local del_fwd  = string.rep("<Del>", vim.fn.strchars(wa))
-    return del_back .. del_fwd .. open_char .. wb .. wa .. close_char
+    return del_back .. del_fwd .. open_ch .. wb .. wa .. close_ch
   end
-  return open_char
+  return open_ch
 end
 
 function M.setup(options)
@@ -95,9 +96,9 @@ function M.setup(options)
 
   PAIRS = vim.tbl_extend("force", default_pairs, user_pairs)
 
-  for open_char in pairs(PAIRS) do
-    vim.keymap.set("i", open_char, function()
-      return handle_pair(open_char)
+  for open_ch in pairs(PAIRS) do
+    vim.keymap.set("i", open_ch, function()
+      return handle_pair(open_ch)
     end, { expr = true, replace_keycodes = true })
   end
 
