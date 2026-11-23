@@ -44,11 +44,13 @@ local function ch_insert(line, col, open_char)
 
   if bal_l == 0 and bal_r == 0 then
     local wb, wa = word_left(line, col), word_right(line, col)
-    if #wb > 0 and #wa > 0 then return 3 end
+    if #wb > 0 and #wa > 0 then
+			return 3
+		end
     return 2
   end
 
-  return 1
+  return 2
 end
 
 local function handle_pair(open_char)
