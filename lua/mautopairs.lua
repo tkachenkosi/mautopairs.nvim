@@ -25,7 +25,6 @@ end
 
 local function ch_insert(line, col, open_char)
   local close_char = PAIRS[open_char]
-  if not close_char then return 1 end
 
   local left  = line:sub(1, col)
   local right = line:sub(col + 1)
@@ -49,7 +48,7 @@ local function ch_insert(line, col, open_char)
     return 2
   end
 
-  return 2
+  return 1
 end
 
 local function handle_pair(open_char)
@@ -72,15 +71,6 @@ local function handle_pair(open_char)
     return del_back .. del_fwd .. open_char .. wb .. wa .. close_char
   end
   return open_char
-end
-
-local function handle_close(close_char)
-  local _, col = unpack(vim.api.nvim_win_get_cursor(0))
-  local line = vim.api.nvim_get_current_line()
-  if line:sub(col + 1, col + 1) == close_char then
-    return "<Right>"
-  end
-  return close_char
 end
 
 function M.setup(options)
@@ -106,16 +96,6 @@ function M.setup(options)
     end, { expr = true, replace_keycodes = true })
   end
 
-  -- Маппинги skip для закрывающих символов, которые не являются «open»
-  local seen = {}
-  for _, close_char in pairs(PAIRS) do
-    if not seen[close_char] and not PAIRS[close_char] then
-      seen[close_char] = true
-      vim.keymap.set("i", close_char, function()
-        return handle_close(close_char)
-      end, { expr = true, replace_keycodes = true })
-    end
-  end
 end
 
 return M
