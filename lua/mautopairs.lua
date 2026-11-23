@@ -21,7 +21,7 @@ local function count_char(str, char)
 end
 
 -- Улучшенная логика вставки
-local function ch_insert2(line, col, open_char)
+local function ch_insert(line, col, open_char)
   local close_char = PAIRS[open_char]
   -- if not close_char then return 1 end
 
@@ -53,52 +53,6 @@ local function ch_insert2(line, col, open_char)
   return 2 -- fallback для скобок
 end
 
-
--- Логика вставки
-local function ch_insert(line, col, open_char)
-  local close_char = PAIRS[open_char]
-  if not close_char then return 1 end
-
-  -- 1. Строгая логика для кавычек (ваше исправление)
-  if open_char == '"' or open_char == "'" then
-    -- Если кавычка уже есть в строке где-либо — просто печатаем её
-    if line:find(vim.pesc(open_char), 1, true) then
-      return 1
-    end
-    -- Если кавычки нет, но мы внутри слова (test|ing) — тоже просто печатаем
-    local before = line:sub(1, col)
-    local after = line:sub(col + 1)
-    if before:match("%S$") and after:match("^%S") then
-      return 1
-    end
-    -- В остальных случаях (начало строки, после пробела, в пустой строке) — вставляем пару
-    return 2
-  end
-
-  -- 2. Логика балансировки для скобок
-  local left = line:sub(1, col)
-  local right = line:sub(col + 1)
-
-  local balance_left = count_char(left, open_char) - count_char(left, close_char)
-  local balance_right = count_char(right, close_char) - count_char(right, open_char)
-
-  if balance_left == 0 and balance_right == 0 then
-    local before = line:sub(1, col):match("[%wА-Яа-я_]+$") or ""
-    local after = line:sub(col + 1):match("^[%wА-Яа-я_]+") or ""
-    if #before > 0 and #after > 0 then
-      return 3 -- обрамить слово
-    end
-    return 2 -- вставить пару
-  end
-
-  -- Если справа уже стоит закрывающая скобка (например, (|)) — просто печатаем открывающую
-  if right:sub(1, 1) == close_char then
-    return 1
-  end
-
-  return 2 -- fallback для скобок
-end
-
 -- Основная обработка
 local function handle_pair(open_char)
   local close_char = PAIRS[open_char]
@@ -108,11 +62,8 @@ local function handle_pair(open_char)
   local line = vim.api.nvim_get_current_line()
   local mode = ch_insert(line, col, open_char)
 
-  -- ВАЖНО: возвращаем управляющие последовательности только для режимов 2 и 3.
-  -- Для режима 1 (обычный ввод) возвращаем пустую строку, чтобы не было дублирования символа.
   if mode == 1 then
-    -- return open_char
-    return ""
+    return open_char
   elseif mode == 2 then
     return open_char .. close_char .. "<Left>"
   elseif mode == 3 then
