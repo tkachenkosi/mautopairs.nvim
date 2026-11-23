@@ -1,3 +1,4 @@
+-- mautopairs.nvim — lightweight auto-pair plugin for Neovim
 local M = {}
 
 local default_pairs = {
@@ -23,6 +24,7 @@ local function word_right(line, col)
   return vim.fn.matchstr(line:sub(col + 1), '^\\k*')
 end
 
+-- Проверка необходимости вставки парного символа
 local function ch_insert(line, col, open_char)
   local close_char = PAIRS[open_char]
 
@@ -53,6 +55,7 @@ local function ch_insert(line, col, open_char)
   return 2
 end
 
+-- Основная логика вставки
 local function handle_pair(open_char)
   local close_char = PAIRS[open_char]
   if not close_char then return open_char end
