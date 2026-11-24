@@ -24,7 +24,7 @@ local function ch_insert(col, open_ch)
 	local lwo, lwc = select(2, left:gsub(vim.pesc(open_ch), "")), select(2, left:gsub(vim.pesc(close_ch), ""))
 	local rwc, rwo = select(2, right:gsub(vim.pesc(close_ch), "")), select(2, right:gsub(vim.pesc(open_ch), ""))
 
-  -- Skip: курсор прямо перед закрывающим символом
+  -- курсор прямо перед закрывающим символом
   if right:sub(1, 1) == close_ch then
     if isQuoted or lwo > lwc then
       return 1				-- одинаковые символы (кавычки) или открытая скобка
@@ -37,11 +37,10 @@ local function ch_insert(col, open_ch)
 	end
 
   if lwo - lwc == 0 and rwc - rwo == 0 then
-		-- word left, word right
-    -- if #wb > 0 and #wa > 0 then
+		-- word left, word right  -- if #wb > 0 and #wa > 0 then
     if vim.fn.strchars(wb) > 0 and vim.fn.strchars(wa) > 0 then
 			-- оборачиваем слово только для двойныых кавычек
-			if open_ch == '"' then return 3 else return 1 end
+			if open_ch == "'" then return 1 else return 3 end
 		end
     return 2
   end
