@@ -38,7 +38,8 @@ local function ch_insert(col, open_ch)
 
   if lwo - lwc == 0 and rwc - rwo == 0 then
 		-- word left, word right
-    if #wb > 0 and #wa > 0 then
+    if open_ch ~= "'" and #wb > 0 and #wa > 0 then
+			-- оборачиваем слово только для двойныых кавычек
 			return 3
 		end
     return 2
@@ -61,7 +62,7 @@ local function handle_pair(open_ch)
   if mode == 1 then
     return open_ch
   elseif mode == 2 then
-		-- вставляем парные символы
+		-- вставляем парные символы, курсор между ними
     return open_ch .. close_ch .. "<Left>"
   elseif mode == 3 then
 		-- обрамляем слово кавычками
