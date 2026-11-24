@@ -30,22 +30,18 @@ local function ch_insert(col, open_ch)
     end
   end
 
-  if isQuoted and (wo % 2 ~= 0 or wc % 2 ~= 0) then
-		-- не четное количество кавычек с левой стороны
-		return 1
-	end
-
   local bal_l = wo  - wc
   local bal_r = select(2, right:gsub(vim.pesc(close_ch), "")) - select(2, right:gsub(vim.pesc(open_ch), ""))
+
+  if isQuoted and (bal_l ~= 0 or bal_r ~= 0) then
+		-- не четное количество кавычек с любой стороны (wo % 2 ~= 0)
+		return 1
+	end
 
   if bal_l == 0 and bal_r == 0 then
 		-- word left, word right
     if #wb > 0 and #wa > 0 then
 			return 3
-		end
-		if wo % 2 ~= 0 then 
-			-- для нечетного количества кавычек с лева, вставляем одну
-			return 1
 		end
     return 2
   end
