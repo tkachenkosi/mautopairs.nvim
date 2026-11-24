@@ -21,24 +21,22 @@ local function ch_insert(col, open_ch)
 
   local left, right = line:sub(1, col), line:sub(col + 1)
 	-- count char - количество открывающих и закрывающий скобок
-	local wo, wc = select(2, left:gsub(vim.pesc(open_ch), "")), select(2, left:gsub(vim.pesc(close_ch), ""))
+	local lwo, lwc = select(2, left:gsub(vim.pesc(open_ch), "")), select(2, left:gsub(vim.pesc(close_ch), ""))
+	local rwc, rwo = select(2, right:gsub(vim.pesc(close_ch), "")), select(2, right:gsub(vim.pesc(open_ch), ""))
 
   -- Skip: курсор прямо перед закрывающим символом
   if right:sub(1, 1) == close_ch then
-    if isQuoted or wo > wc then
+    if isQuoted or lwo > lwc then
       return 1				-- одинаковые символы (кавычки) или открытая скобка
     end
   end
 
-  local bal_l = wo  - wc
-  local bal_r = select(2, right:gsub(vim.pesc(close_ch), "")) - select(2, right:gsub(vim.pesc(open_ch), ""))
-
-  if isQuoted and (bal_l ~= 0 or bal_r ~= 0) then
-		-- не четное количество кавычек с любой стороны (wo % 2 ~= 0)
+  if isQuoted and (lwo % 2 ~= 0 or rwo % 2 ~= 0) then
+		-- не четное количество кавычек с любой стороны
 		return 1
 	end
 
-  if bal_l == 0 and bal_r == 0 then
+  if lwo - lwc == 0 and rwc - rwo == 0 then
 		-- word left, word right
     if #wb > 0 and #wa > 0 then
 			return 3
