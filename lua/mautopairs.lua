@@ -38,9 +38,9 @@ local function ch_insert(col, open_ch)
 
   if lwo - lwc == 0 and rwc - rwo == 0 then
 		-- word left, word right
-    if open_ch ~= "'" and #wb > 0 and #wa > 0 then
+    if #wb > 0 and #wa > 0 then
 			-- оборачиваем слово только для двойныых кавычек
-			return 3
+			if open_ch == '"' then return 3 else return 1 end
 		end
     return 2
   end
