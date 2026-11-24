@@ -17,20 +17,23 @@ local wb, wa	-- word left, word right
 -- Проверка необходимости вставки парного символа
 local function ch_insert(col, open_ch)
   local close_ch = PAIRS[open_ch]
+	local isQuoted = open_ch == close_ch
 
   local left, right = line:sub(1, col), line:sub(col + 1)
-	-- count char
+	-- count char - количество открывающих и закрывающий скобок
 	local wo, wc = select(2, left:gsub(vim.pesc(open_ch), "")), select(2, left:gsub(vim.pesc(close_ch), ""))
 
   -- Skip: курсор прямо перед закрывающим символом
   if right:sub(1, 1) == close_ch then
-    if open_ch == close_ch then
-      return 1                                -- одинаковые символы (кавычки)
-    end
-    if wo > wc then
-      return 1                                -- есть «открытая» скобка
+    if isQuoted or wo > wc then
+      return 1				-- одинаковые символы (кавычки) или открытая скобка
     end
   end
+
+  if isQuoted and (wo % 2 ~= 0 or wc % 2 ~= 0) then
+		-- не четное количество кавычек с левой стороны
+		return 1
+	end
 
   local bal_l = wo  - wc
   local bal_r = select(2, right:gsub(vim.pesc(close_ch), "")) - select(2, right:gsub(vim.pesc(open_ch), ""))
@@ -39,6 +42,10 @@ local function ch_insert(col, open_ch)
 		-- word left, word right
     if #wb > 0 and #wa > 0 then
 			return 3
+		end
+		if wo % 2 ~= 0 then 
+			-- для нечетного количества кавычек с лева, вставляем одну
+			return 1
 		end
     return 2
   end
@@ -60,8 +67,10 @@ local function handle_pair(open_ch)
   if mode == 1 then
     return open_ch
   elseif mode == 2 then
+		-- вставляем парные символы
     return open_ch .. close_ch .. "<Left>"
   elseif mode == 3 then
+		-- обрамляем слово кавычками
     local del_back = string.rep("<C-h>", vim.fn.strchars(wb))
     local del_fwd  = string.rep("<Del>", vim.fn.strchars(wa))
     return del_back .. del_fwd .. open_ch .. wb .. wa .. close_ch
