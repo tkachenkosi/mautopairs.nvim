@@ -49,7 +49,6 @@ local function ch_insert(col, open_ch)
 
   if lwo - lwc == 0 and rwc - rwo == 0 then
 		-- word left, word right  -- if #wb > 0 and #wa > 0 then
-    -- if vim.fn.strchars(wb) > 0 and vim.fn.strchars(wa) > 0 then
     if wb ~= '' and wa ~= '' then
 			-- оборачиваем слово только для двойныых кавычек
 			if open_ch == "'" then return 1 else return 3 end
