@@ -14,6 +14,17 @@ local PAIRS = {}
 local line
 local wb, wa	-- word left, word right
 
+-- подсчет символов
+local function count(s, ch)
+  local n = 0
+  local i = s:find(ch, 1, true)
+  while i do
+    n = n + 1
+    i = s:find(ch, i + 1, true)
+  end
+  return n
+end
+
 -- Проверка необходимости вставки парного символа
 local function ch_insert(col, open_ch)
   local close_ch = PAIRS[open_ch]
@@ -21,8 +32,8 @@ local function ch_insert(col, open_ch)
 
   local left, right = line:sub(1, col), line:sub(col + 1)
 	-- count char - количество открывающих и закрывающий скобок
-	local lwo, lwc = select(2, left:gsub(vim.pesc(open_ch), "")), select(2, left:gsub(vim.pesc(close_ch), ""))
-	local rwc, rwo = select(2, right:gsub(vim.pesc(close_ch), "")), select(2, right:gsub(vim.pesc(open_ch), ""))
+	local lwo, lwc = count(left, open_ch), count(left, close_ch)
+	local rwo, rwc = count(right, open_ch), count(right, close_ch)
 
   -- курсор прямо перед закрывающим символом
   if right:sub(1, 1) == close_ch then
@@ -38,7 +49,8 @@ local function ch_insert(col, open_ch)
 
   if lwo - lwc == 0 and rwc - rwo == 0 then
 		-- word left, word right  -- if #wb > 0 and #wa > 0 then
-    if vim.fn.strchars(wb) > 0 and vim.fn.strchars(wa) > 0 then
+    -- if vim.fn.strchars(wb) > 0 and vim.fn.strchars(wa) > 0 then
+    if wb ~= '' and wa ~= '' then
 			-- оборачиваем слово только для двойныых кавычек
 			if open_ch == "'" then return 1 else return 3 end
 		end
