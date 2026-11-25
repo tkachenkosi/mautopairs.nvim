@@ -32,23 +32,23 @@ local function ch_insert(col, open_ch)
 
   local left, right = line:sub(1, col), line:sub(col + 1)
 	-- count char - количество открывающих и закрывающий скобок
-	local lwo, lwc = count(left, open_ch), count(left, close_ch)
-	local rwo, rwc = count(right, open_ch), count(right, close_ch)
+	local wol, wcl = count(left, open_ch), count(left, close_ch)
+	local wor, wcr = count(right, open_ch), count(right, close_ch)
 
   -- курсор прямо перед закрывающим символом
   if right:sub(1, 1) == close_ch then
-    if isQuoted or lwo > lwc then
-			print("1")
+    if isQuoted or wol > wcl then
+			print("1 "..wol..wcl )
       return 1				-- одинаковые символы (кавычки) или открытая скобка
     end
   end
 
-  if isQuoted and (lwo % 2 ~= 0 or rwo % 2 ~= 0) then
+  if isQuoted and (wol % 2 ~= 0 or wor % 2 ~= 0) then
 		-- не четное количество кавычек с любой стороны
 		return 1
 	end
 
-  if lwo - lwc == 0 and rwc - rwo == 0 then
+  if wol - wcl == 0 and wcr - wor == 0 then
 		-- word left, word right  -- if #wb > 0 and #wa > 0 then
     if wb ~= '' and wa ~= '' then
 			-- оборачиваем слово только для двойныых кавычек
