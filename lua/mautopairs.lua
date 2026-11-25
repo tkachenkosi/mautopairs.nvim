@@ -29,18 +29,13 @@ local function handle_pair(open_ch)
   if not close_ch then return open_ch end
 	local isQuoted = open_ch == close_ch
 
-  local _, col = unpack(vim.api.nvim_win_get_cursor(0))
+	local col =	vim.api.nvim_win_get_cursor(0)[2]
   local line = vim.api.nvim_get_current_line()
 
   local left, right = line:sub(1, col), line:sub(col + 1)
 	-- count char - количество открывающих и закрывающий скобок
 	local wol, wcl = count(left, open_ch), count(left, close_ch)
 	local wor, wcr = count(right, open_ch), count(right, close_ch)
-
-  -- курсор прямо перед закрывающим символом
-  if right:sub(1, 1) == close_ch and (isQuoted or wol > wcl) then
-    return open_ch
-  end
 
 	-- не четное количество кавычек с любой стороны
   if isQuoted and (wol % 2 ~= 0 or wor % 2 ~= 0) then
@@ -49,7 +44,6 @@ local function handle_pair(open_ch)
 
   if wol - wcl == 0 and wcr - wor == 0 then
 		-- оборачиваем слово только для двойныых кавычек
-		-- local wb	-- подстрока слева вычесляем ниже
 		local wa = vim.fn.matchstr(line:sub(col + 1), '^\\k*')
     if wa ~= '' then
 			-- для оптимизации выделяем подстроку с лева здесь
@@ -89,7 +83,7 @@ function M.setup(options)
   for open_ch in pairs(PAIRS) do
     vim.keymap.set("i", open_ch, function()
       return handle_pair(open_ch)
-    end, { expr = true, replace_keycodes = true })
+    end, { expr = true })
   end
 
 end
