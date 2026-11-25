@@ -38,7 +38,7 @@ local function ch_insert(col, open_ch)
   -- курсор прямо перед закрывающим символом
   if right:sub(1, 1) == close_ch then
     if isQuoted or wol > wcl then
-			print("1 "..wol..wcl )
+			print("1 "..wol..wcl..left..'|'..right )
       return 1				-- одинаковые символы (кавычки) или открытая скобка
     end
   end
