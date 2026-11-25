@@ -11,8 +11,6 @@ local default_pairs = {
 }
 
 local PAIRS = {}
-local line
-local wb, wa	-- word left, word right
 
 -- подсчет символов
 local function count(s, ch)
@@ -25,10 +23,14 @@ local function count(s, ch)
   return n
 end
 
--- Проверка необходимости вставки парного символа
-local function ch_insert(col, open_ch)
+-- Основная логика вставки
+local function handle_pair(open_ch)
   local close_ch = PAIRS[open_ch]
+  if not close_ch then return open_ch end
 	local isQuoted = open_ch == close_ch
+
+  local _, col = unpack(vim.api.nvim_win_get_cursor(0))
+  local line = vim.api.nvim_get_current_line()
 
   local left, right = line:sub(1, col), line:sub(col + 1)
 	-- count char - количество открывающих и закрывающий скобок
@@ -36,53 +38,32 @@ local function ch_insert(col, open_ch)
 	local wor, wcr = count(right, open_ch), count(right, close_ch)
 
   -- курсор прямо перед закрывающим символом
-  if right:sub(1, 1) == close_ch then
-    if isQuoted or wol > wcl then
-			print("1 "..wol..wcl..left..'|'..right )
-      return 1				-- одинаковые символы (кавычки) или открытая скобка
-    end
+  if right:sub(1, 1) == close_ch and (isQuoted or wol > wcl) then
+    return open_ch
   end
 
+	-- не четное количество кавычек с любой стороны
   if isQuoted and (wol % 2 ~= 0 or wor % 2 ~= 0) then
-		-- не четное количество кавычек с любой стороны
-		return 1
+    return open_ch
 	end
 
   if wol - wcl == 0 and wcr - wor == 0 then
-		-- word left, word right  -- if #wb > 0 and #wa > 0 then
-    if wb ~= '' and wa ~= '' then
-			-- оборачиваем слово только для двойныых кавычек
-			if open_ch == "'" then return 1 else return 3 end
+		-- оборачиваем слово только для двойныых кавычек
+		-- local wb	-- подстрока слева вычесляем ниже
+		local wa = vim.fn.matchstr(line:sub(col + 1), '^\\k*')
+    if open_ch ~= "'" and wa ~= '' then
+			-- для оптимизации выделяем подстроку с лева здесь
+			local wb = vim.fn.matchstr(line:sub(1, col), '\\k*$')
+			if wb ~= '' then
+				-- обрамляем слово кавычками
+				local del_back = string.rep("<C-h>", vim.fn.strchars(wb))
+				local del_fwd  = string.rep("<Del>", vim.fn.strchars(wa))
+				return del_back .. del_fwd .. open_ch .. wb .. wa .. close_ch
+			end
 		end
-    return 2
-  end
-
-			print("0")
-  return 1
-end
-
--- Основная логика вставки
-local function handle_pair(open_ch)
-  local close_ch = PAIRS[open_ch]
-  if not close_ch then return open_ch end
-
-  local _, col = unpack(vim.api.nvim_win_get_cursor(0))
-  line = vim.api.nvim_get_current_line()
-	wb = vim.fn.matchstr(line:sub(1, col), '\\k*$')
-	wa = vim.fn.matchstr(line:sub(col + 1), '^\\k*')
-  local mode = ch_insert(col, open_ch)
-
-  if mode == 1 then
-    return open_ch
-  elseif mode == 2 then
-		-- вставляем парные символы, курсор между ними
     return open_ch .. close_ch .. "<Left>"
-  elseif mode == 3 then
-		-- обрамляем слово кавычками
-    local del_back = string.rep("<C-h>", vim.fn.strchars(wb))
-    local del_fwd  = string.rep("<Del>", vim.fn.strchars(wa))
-    return del_back .. del_fwd .. open_ch .. wb .. wa .. close_ch
   end
+
   return open_ch
 end
 
