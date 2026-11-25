@@ -51,14 +51,16 @@ local function handle_pair(open_ch)
 		-- оборачиваем слово только для двойныых кавычек
 		-- local wb	-- подстрока слева вычесляем ниже
 		local wa = vim.fn.matchstr(line:sub(col + 1), '^\\k*')
-    if wa ~= '' and open_ch ~= "'" then
+    if wa ~= '' then
 			-- для оптимизации выделяем подстроку с лева здесь
 			local wb = vim.fn.matchstr(line:sub(1, col), '\\k*$')
-			if wb ~= '' then
+			if wb ~= '' and open_ch ~= "'" then
 				-- обрамляем слово кавычками
 				local del_back = string.rep("<C-h>", vim.fn.strchars(wb))
 				local del_fwd  = string.rep("<Del>", vim.fn.strchars(wa))
 				return del_back .. del_fwd .. open_ch .. wb .. wa .. close_ch
+			else
+				return open_ch
 			end
 		end
     return open_ch .. close_ch .. "<Left>"
