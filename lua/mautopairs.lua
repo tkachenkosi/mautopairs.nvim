@@ -51,7 +51,7 @@ local function handle_pair(open_ch)
 		-- оборачиваем слово только для двойныых кавычек
 		-- local wb	-- подстрока слева вычесляем ниже
 		local wa = vim.fn.matchstr(line:sub(col + 1), '^\\k*')
-    if open_ch ~= "'" and wa ~= '' then
+    if wa ~= '' and open_ch ~= "'" then
 			-- для оптимизации выделяем подстроку с лева здесь
 			local wb = vim.fn.matchstr(line:sub(1, col), '\\k*$')
 			if wb ~= '' then
