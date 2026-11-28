@@ -38,14 +38,13 @@ local function handle_pair(open_ch)
 	local wol, wor = count(left, open_ch), count(right, open_ch)
 	local wcl, wcr
 	if isQuoted then
+		-- не четное количество кавычек с любой стороны
+		if wol % 2 ~= 0 or wor % 2 ~= 0 then
+			return open_ch
+		end
 		wcl, wcr = wol, wor
 	else
 		wcl, wcr = count(left, close_ch), count(right, close_ch)
-	end
-
-	-- не четное количество кавычек с любой стороны
-  if isQuoted and (wol % 2 ~= 0 or wor % 2 ~= 0) then
-    return open_ch
 	end
 
   if wol - wcl == 0 and wcr - wor == 0 then
