@@ -33,9 +33,15 @@ local function handle_pair(open_ch)
   local line = vim.api.nvim_get_current_line()
 
   local left, right = line:sub(1, col), line:sub(col + 1)
+
 	-- count char - количество открывающих и закрывающий скобок
-	local wol, wcl = count(left, open_ch), count(left, close_ch)
-	local wor, wcr = count(right, open_ch), count(right, close_ch)
+	local wol, wor = count(left, open_ch), count(right, open_ch)
+	local wcl, wcr
+	if isQuoted then
+		wcl, wcr = wol, wor
+	else
+		wcl, wcr = count(left, close_ch), count(right, close_ch)
+	end
 
 	-- не четное количество кавычек с любой стороны
   if isQuoted and (wol % 2 ~= 0 or wor % 2 ~= 0) then
